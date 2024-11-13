@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql
+    container_name: database
+    restart: always
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_USER: joel
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - data:/var/lib/mysql
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - '27017:27017'
+    expose:
+      - '27017'
+    environment:
+      MONGO_INITDB_DATABASE: nestjsfeatures
+    #   MONGO_INITDB_ROOT_USERNAME: joel
+    #   MONGO_INITDB_ROOT_PASSWORD: 123456
+    volumes:
+      - data:/var/lib/mongodb
+    
+  # backend:
+  #   image: joelquispe/nestfunctions
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: nestsappfunctions
+  #   restart: always
+   
+  #   ports:
+  #     - '3001:3001'
+  #   expose:
+  #     - '3001'
+  #   volumes:
+  #     - ./src:/app/src
+volumes:
+  data:
