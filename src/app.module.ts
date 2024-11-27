@@ -31,13 +31,11 @@ import { AuthenticationsModule } from './modules/authentications/authentications
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { UsersSeeder } from './modules/users/seeders/users.seeder';
 import { TwilioModule } from 'nestjs-twilio';
+import { YapeModule } from './modules/yape/yape.module';
+import { TwilioClientModule } from './modules/twilio-client/twilio-client.module';
 
 @Module({
   imports: [
-    TwilioModule.forRoot({
-      accountSid: process.env.TWILIO_ACCOUNT_SID,
-      authToken: process.env.TWILIO_AUTH_TOKEN,
-    }),
     // GraphQLModule.forRoot<ApolloDriverConfig>({
     //   driver: ApolloDriver,
     //   typePaths: ['**/*.graphql'],
@@ -74,6 +72,9 @@ import { TwilioModule } from 'nestjs-twilio';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
+    YapeModule,
+    TwilioClientModule,
+
     // ProductsModule,
     // CategoriesModule,
     // AuthenticationsModule,
@@ -87,7 +88,6 @@ import { TwilioModule } from 'nestjs-twilio';
   providers: [
     FooResolver,
     AppService,
-
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

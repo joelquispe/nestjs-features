@@ -1,44 +1,52 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { ClassSerializerInterceptor } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import { ResponseFormatInterceptor } from './core/interceptors/response.interceptor';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import corsConfig from './config/cors.config';
 
 config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   //FILTROS PARA EXCEPCIONES
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     transform: true,
-  //   }),
-  // );
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
 
   //SWAGGER SETUP
-  // const config = new DocumentBuilder()
-  //   .setTitle('Ficha Pep')
-  //   .setDescription('Api Pep')
-  //   .setVersion('1.0')
-  //   .addTag('pep')
-  //   .build();
+  const config = new DocumentBuilder()
+    .setTitle('NestJs Features')
+    .setDescription('Implementaciones de ejemplo')
+    .setVersion('1.0')
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, documentFactory);
 
   //REFLECTO
   const reflector = app.get(Reflector);
-  app.useGlobalInterceptors(new ResponseFormatInterceptor());
+  app.useGlobalInterceptors(
+    new ResponseFormatInterceptor(),
+    new ClassSerializerInterceptor(reflector),
+  );
+  // WEBSOCKETS
   app.useWebSocketAdapter(new IoAdapter(app));
-  app.enableCors({
-    origin: 'http://localhost:4200', // Reemplaza con la URL de tu aplicación de Angular
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  });
+
+  // CORS
+  app.enableCors(corsConfig);
+
   app.setGlobalPrefix('api');
   app.use(cookieParser());
+
   const configService = app.get(ConfigService);
-  await app.listen(3000);
+  console.log(`Listen on ${configService.get('port')}`);
+  await app.listen(configService.get('port'));
 }
 bootstrap();

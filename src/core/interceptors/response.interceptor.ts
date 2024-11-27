@@ -3,6 +3,7 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  HttpException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -20,10 +21,20 @@ export class ResponseFormatInterceptor<T> implements NestInterceptor<T> {
         error: null,
       })),
       catchError((err) => {
-        const statusCode = err.status || 500;
+        // Si el error es una instancia de HttpException, accedemos a sus propiedades
+        const statusCode = err instanceof HttpException ? err.getStatus() : 500;
+        const responseMessage =
+          err instanceof HttpException ? err.getResponse() : err;
+
         response.status(statusCode);
+
+        // Retorna la respuesta formateada
         return new Observable((subscriber) => {
-          subscriber.next(err.response || err);
+          subscriber.next({
+            statusCode,
+            error: responseMessage,
+            message: responseMessage?.message || 'Internal server error', // Aquí se ajusta el mensaje
+          });
           subscriber.complete();
         });
       }),

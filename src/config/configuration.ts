@@ -15,7 +15,7 @@
 
 import { registerAs } from '@nestjs/config';
 
-export default registerAs('database', () => ({
+export default registerAs('', () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   jwtSecret: process.env.JWT_SECRET,
   name: 'joel',
@@ -23,6 +23,12 @@ export default registerAs('database', () => ({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK_URL,
+  },
+  paymentMarket: {
+    // se obtiene en la cuenta de mercado pago al crear una app
+    publicKey: process.env.PAYMENT_MARKET_PUBLIC_KEY,
+    // se obtiene en la cuenta de mercado pago al crear una app
+    accessToken: process.env.PAYMENT_MARKET_ACCESS_TOKEN,
   },
   database: {
     host: process.env.DB_HOST,
