@@ -46,7 +46,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const configService = app.get(ConfigService);
-  console.log(`Listen on ${configService.get('port')}`);
-  await app.listen(configService.get('port'));
+  console.log(`Listen on ${configService.get('port') || 3000}`);
+  await app.listen(configService.get('port') || 3000);
 }
 bootstrap();

@@ -10,3 +10,9 @@ Hola amigos, en este repositorio podran visualizar muchas implementaciones: paga
 #### Implementanciones desarrolladas:
 - Mercado Pago -> Pagos por Yape
 - Twilio -> Envio de sms 
+
+#### Notas
+
+###### Swagger
+El puerto(port) se pone en el archivo env, por defecto es el 3000
+- Para abrir el swagger debe abrir en el navegador http://localhost:port/api/docs
