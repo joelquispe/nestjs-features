@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class IGenerateTokenYapeReqDto {
+class GenerateTokenYapeReqDto {
   @ApiProperty()
   phoneNumber: string;
 
@@ -8,4 +8,4 @@ class IGenerateTokenYapeReqDto {
   otp: string;
 }
 
-export default IGenerateTokenYapeReqDto;
+export default GenerateTokenYapeReqDto;

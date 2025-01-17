@@ -8,6 +8,7 @@ import { config } from 'dotenv';
 import { ResponseFormatInterceptor } from './core/interceptors/response.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import corsConfig from './config/cors.config';
+import { JwtAuthGuard } from './modules/auth/guards/jwtAuth.guard';
 
 config();
 async function bootstrap() {
@@ -24,11 +25,22 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('NestJs Features')
     .setDescription('Implementaciones de ejemplo')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
     .setVersion('1.0')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, documentFactory);
+  SwaggerModule.setup('api/docs', app, documentFactory, {
+    swaggerOptions: { persistAuthorization: true },
+  });
 
   //REFLECTO
   const reflector = app.get(Reflector);

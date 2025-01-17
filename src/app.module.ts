@@ -80,7 +80,7 @@ import { TwilioClientModule } from './modules/twilio-client/twilio-client.module
     // AuthenticationsModule,
     // typeOrmModuleConfig,
     // mongooseModuleConfig,
-    // AuthModule,
+    AuthModule,
     // UsersModule,
     // TasksModule,
   ],
