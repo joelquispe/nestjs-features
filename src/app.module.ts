@@ -33,6 +33,7 @@ import { UsersSeeder } from './modules/users/seeders/users.seeder';
 import { TwilioModule } from 'nestjs-twilio';
 import { YapeModule } from './modules/yape/yape.module';
 import { TwilioClientModule } from './modules/twilio-client/twilio-client.module';
+import { PaymentCardModule } from './modules/payment-card/payment-card.module';
 
 @Module({
   imports: [
@@ -81,6 +82,8 @@ import { TwilioClientModule } from './modules/twilio-client/twilio-client.module
     // typeOrmModuleConfig,
     // mongooseModuleConfig,
     AuthModule,
+
+    PaymentCardModule,
     // UsersModule,
     // TasksModule,
   ],

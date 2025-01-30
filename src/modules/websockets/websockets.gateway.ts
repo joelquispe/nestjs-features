@@ -4,6 +4,7 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -15,29 +16,42 @@ import { Server, Socket } from 'socket.io';
   cors: true,
 })
 export class WebsocketsGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit
+  implements
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleInit,
+    OnGatewayInit
 {
+  onModuleInit() {
+    console.log('hola');
+  }
   @WebSocketServer()
   server: Server;
 
-  onModuleInit() {
-    this.server.on('connection', (data) => {
-      console.log(data.id);
-    });
+  handleConnection(client: Socket) {
+    console.log(`Cliente conectado: ${client.id}`);
+
+    // Enviar un mensaje a todos los clientes conectados
+    this.server.emit('message', 'Bienvenido a todos los clientes!');
   }
-  handleDisconnect(client: any) {
-    client.emit('disconnectss');
+
+  // Este método se llama cuando un cliente se desconecta
+  handleDisconnect(client: Socket) {
+    console.log(`Cliente desconectado: ${client.id}`);
   }
-  handleConnection(client: any, ...args: any[]) {
-    client.emit('connected');
+
+  // Este método se llama cuando el Gateway se inicializa
+  afterInit() {
+    console.log('WebSocket Gateway Inicializado');
   }
+
+  // Este es un ejemplo de un mensaje personalizado (en este caso "events")
   @SubscribeMessage('message')
-  handleMessage(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() payload: any,
-  ): string {
-    this.server.emit('messageServer', 'texto desde el cliente');
-    console.log(payload);
-    return 'Hello world!';
+  handleMessage(client: Socket, payload: string): string {
+    console.log(`Mensaje recibido: ${payload}`);
+
+    // Enviar un mensaje al cliente específico que envió el mensaje
+    client.emit('position', `Mensaje recibido: ${payload}`);
+    return 'Mensaje recibido correctamente';
   }
 }
