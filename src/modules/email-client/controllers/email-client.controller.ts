@@ -2,9 +2,6 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { EmailClientService } from '../services/email-client.service';
 import { SendEmailReqDto, SendEmailRespDto } from '../dtos';
 
-
-
-
 @Controller('email-client')
 export class EmailClientController {
   constructor(private readonly emailClientService: EmailClientService) {}
