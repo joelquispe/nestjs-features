@@ -39,4 +39,7 @@ export default registerAs('', () => ({
     name: process.env.DB_NAME,
     mongo_uri: process.env.MONGO_URI,
   },
+  brevo: {
+    apiKey: process.env.BREVO_API_KEY
+  }
 }));

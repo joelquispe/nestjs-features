@@ -42,12 +42,13 @@ async function bootstrap() {
     swaggerOptions: { persistAuthorization: true },
   });
 
-  //REFLECTO
+  //REFLECTOR
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(
     new ResponseFormatInterceptor(),
     new ClassSerializerInterceptor(reflector),
   );
+
   // WEBSOCKETS
   app.useWebSocketAdapter(new IoAdapter(app));
 
