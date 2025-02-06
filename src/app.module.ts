@@ -34,6 +34,7 @@ import { TwilioModule } from 'nestjs-twilio';
 import { YapeModule } from './modules/yape/yape.module';
 import { TwilioClientModule } from './modules/twilio-client/twilio-client.module';
 import { PaymentCardModule } from './modules/payment-card/payment-card.module';
+import { PushToTalkModule } from './modules/push-to-talk/push-to-talk.module';
 
 @Module({
   imports: [
@@ -84,6 +85,8 @@ import { PaymentCardModule } from './modules/payment-card/payment-card.module';
     AuthModule,
 
     PaymentCardModule,
+
+    PushToTalkModule,
     // UsersModule,
     // TasksModule,
   ],

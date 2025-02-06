@@ -21,7 +21,7 @@ export class HandleErrorUtil extends HttpException {
       typeof type === 'number'
         ? type
         : HttpStatus[type] || HttpStatus.INTERNAL_SERVER_ERROR;
-    super(message, status);
+    super(message, status); 
   }
 
   public static createSignatureError(error: AxiosError) {

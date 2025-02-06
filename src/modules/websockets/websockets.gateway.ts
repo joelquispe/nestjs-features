@@ -17,11 +17,10 @@ import { Server, Socket } from 'socket.io';
 })
 export class WebsocketsGateway
   implements
-    OnGatewayConnection,
-    OnGatewayDisconnect,
-    OnModuleInit,
-    OnGatewayInit
-{
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnModuleInit,
+  OnGatewayInit {
   onModuleInit() {
     console.log('hola');
   }
