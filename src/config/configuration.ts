@@ -37,7 +37,7 @@ export default registerAs('', () => ({
     password: process.env.DB_PASSWORD,
     rootPassword: process.env.DB_ROOT_PASSWORD,
     name: process.env.DB_NAME,
-    mongo_uri: process.env.MONGO_URI,
+    mongodb_uri: process.env.MONGO_URI,
   },
   brevo: {
     apiKey: process.env.BREVO_API_KEY
