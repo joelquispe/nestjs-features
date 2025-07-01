@@ -36,6 +36,7 @@ import { YapeModule } from './modules/yape/yape.module';
 import { TwilioClientModule } from './modules/twilio-client/twilio-client.module';
 import { PaymentCardModule } from './modules/payment-card/payment-card.module';
 import { EmailClientModule } from './modules/email-client/email-client.module';
+import { StripeModule } from './modules/stripe/stripe.module';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
@@ -78,6 +79,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     YapeModule,
     TwilioClientModule,
+    StripeModule,
     
     AuthenticationsModule,
     // typeOrmModuleConfig,
