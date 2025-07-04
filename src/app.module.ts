@@ -89,7 +89,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     //     return {
     //       autoCreate: true,
     //       dbName: 'example_db',
-    //       uri: 'mongodb+srv://admin:kZutnqoKFPflXCUE@cluster0.nqyks.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+    //       uri: 'mongodb+srv://user:password@cluster0.nqyks.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
     //     };
     //   },
     // }),
