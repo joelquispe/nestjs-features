@@ -48,9 +48,9 @@ export class WebsocketsGateway
   @SubscribeMessage('message')
   handleMessage(client: Socket, payload: string): string {
     console.log(`Mensaje recibido: ${payload}`);
-
+    
     // Enviar un mensaje al cliente específico que envió el mensaje
-    client.emit('position', `Mensaje recibido: ${payload}`);
+    this.server.emit('position', `Mensaje recibido: ${payload}`);
     return 'Mensaje recibido correctamente';
   }
 }

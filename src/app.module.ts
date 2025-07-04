@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { WebsocketsModule } from './modules/websockets/websockets.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import environments from './enviroments';
 import { JwtModule } from '@nestjs/jwt';
@@ -11,6 +11,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { UsersModule } from './modules/users/users.module';
 import {
+  configModuleConfig,
   mongooseModuleConfig,
   typeOrmModuleConfig,
 } from './config/type_orm_module.config';
@@ -34,7 +35,9 @@ import { TwilioModule } from 'nestjs-twilio';
 import { YapeModule } from './modules/yape/yape.module';
 import { TwilioClientModule } from './modules/twilio-client/twilio-client.module';
 import { PaymentCardModule } from './modules/payment-card/payment-card.module';
-import { PushToTalkModule } from './modules/push-to-talk/push-to-talk.module';
+import { EmailClientModule } from './modules/email-client/email-client.module';
+import { StripeModule } from './modules/stripe/stripe.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -76,17 +79,25 @@ import { PushToTalkModule } from './modules/push-to-talk/push-to-talk.module';
     }),
     YapeModule,
     TwilioClientModule,
-
+    StripeModule,
+    
+    AuthenticationsModule,
+    // typeOrmModuleConfig,
+    // MongooseModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: async (configService: ConfigService) => {
+    //     return {
+    //       autoCreate: true,
+    //       dbName: 'example_db',
+    //       uri: 'mongodb+srv://admin:kZutnqoKFPflXCUE@cluster0.nqyks.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+    //     };
+    //   },
+    // }),
     // ProductsModule,
     // CategoriesModule,
-    // AuthenticationsModule,
-    // typeOrmModuleConfig,
-    // mongooseModuleConfig,
-    AuthModule,
-
-    PaymentCardModule,
-
-    PushToTalkModule,
+    // AuthModule,
+    // PaymentCardModule,
+    // EmailClientModule,
     // UsersModule,
     // TasksModule,
   ],

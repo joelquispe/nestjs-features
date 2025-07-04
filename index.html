@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripe Payment Method Form</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: #f9fafb;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .stripe-element {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+        }
+
+        .stripe-element--focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .stripe-element--invalid {
+            border-color: #ef4444;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .success-message {
+            color: #10b981;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .result-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .result-details {
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .payment-flow-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .payment-flow-info h3 {
+            color: #334155;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .payment-flow-info p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="header">
+            <h1>💳 Stripe Payment</h1>
+            <p>Secure payment method creation and processing</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('create-method')">Create Payment Method</div>
+            <div class="tab" onclick="switchTab('direct-payment')">Direct Payment</div>
+        </div>
+
+        <!-- Create Payment Method Tab -->
+        <div id="create-method" class="tab-content active">
+            <div class="payment-flow-info">
+                <h3>🔒 Create & Save Payment Method</h3>
+                <p>Securely save your payment information for future purchases. Your card details are encrypted and stored safely with Stripe.</p>
+            </div>
+
+            <form id="payment-method-form">
+                <div class="form-group">
+                    <label for="customer-email">Email Address</label>
+                    <input type="email" id="customer-email" class="form-input" required 
+                           placeholder="customer@example.com" value="test@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="cardholder-name">Cardholder Name</label>
+                    <input type="text" id="cardholder-name" class="form-input" required 
+                           placeholder="John Doe" value="Test User">
+                </div>
+
+                <div class="form-group">
+                    <label for="card-element">Card Information</label>
+                    <div id="card-element" class="stripe-element">
+                        <!-- Stripe Elements will create form elements here -->
+                    </div>
+                    <div id="card-errors" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number (Optional)</label>
+                    <input type="tel" id="phone" class="form-input" 
+                           placeholder="+1 (555) 123-4567" value="+1234567890">
+                </div>
+
+                <button type="submit" id="submit-pm" class="submit-btn">
+                    Create Payment Method
+                </button>
+
+                <div id="loading-pm" class="loading">
+                    <div class="spinner"></div>
+                    <span>Creating payment method...</span>
+                </div>
+            </form>
+        </div>
+
+        <!-- Direct Payment Tab -->
+        <div id="direct-payment" class="tab-content">
+            <div class="payment-flow-info">
+                <h3>⚡ Direct Payment</h3>
+                <p>Make a one-time payment. Create a payment intent and confirm it immediately with your card.</p>
+            </div>
+
+            <form id="payment-form">
+                <div class="form-group">
+                    <label for="payment-email">Email Address</label>
+                    <input type="email" id="payment-email" class="form-input" required 
+                           placeholder="customer@example.com" value="test@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-amount">Amount (USD)</label>
+                    <input type="number" id="payment-amount" class="form-input" required 
+                           placeholder="20.00" value="20.00" min="0.50" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-description">Description</label>
+                    <input type="text" id="payment-description" class="form-input" required 
+                           placeholder="Payment for order #123" value="Test Payment">
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-name">Cardholder Name</label>
+                    <input type="text" id="payment-name" class="form-input" required 
+                           placeholder="John Doe" value="Test User">
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-card-element">Card Information</label>
+                    <div id="payment-card-element" class="stripe-element">
+                        <!-- Stripe Elements will create form elements here -->
+                    </div>
+                    <div id="payment-card-errors" class="error-message"></div>
+                </div>
+
+                <button type="submit" id="submit-payment" class="submit-btn">
+                    Pay Now
+                </button>
+
+                <div id="loading-payment" class="loading">
+                    <div class="spinner"></div>
+                    <span>Processing payment...</span>
+                </div>
+            </form>
+        </div>
+
+        <div id="result" class="result-container">
+            <div id="result-title" class="result-title"></div>
+            <div id="result-message"></div>
+            <div id="result-details" class="result-details"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Stripe with your publishable key
+        const stripe = Stripe('pk_test_51RfujvQYiPFJEM6pWBCwCFohQ6DO8x9fPYTUwOnbX475VdXY72srEQrJAq0CC9ZMWTx6ip7qRcY9GG3uVQqlAHrs00dJdt7m0X'); // Replace with your publishable key
+        
+        // Backend API base URL
+        const API_BASE_URL = 'http://localhost:3000'; // Replace with your backend URL
+
+        // Create Stripe Elements instances
+        const elements = stripe.elements();
+        const paymentElements = stripe.elements();
+
+        // Create card elements for both forms
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                        color: '#aab7c4',
+                    },
+                },
+                invalid: {
+                    color: '#9e2146',
+                },
+            },
+        });
+
+        const paymentCardElement = paymentElements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                        color: '#aab7c4',
+                    },
+                },
+                invalid: {
+                    color: '#9e2146',
+                },
+            },
+        });
+
+        // Mount card elements
+        cardElement.mount('#card-element');
+        paymentCardElement.mount('#payment-card-element');
+
+        // Handle real-time validation errors from the card Element
+        cardElement.on('change', ({ error }) => {
+            const displayError = document.getElementById('card-errors');
+            if (error) {
+                displayError.textContent = error.message;
+                displayError.style.display = 'block';
+            } else {
+                displayError.style.display = 'none';
+            }
+        });
+
+        paymentCardElement.on('change', ({ error }) => {
+            const displayError = document.getElementById('payment-card-errors');
+            if (error) {
+                displayError.textContent = error.message;
+                displayError.style.display = 'block';
+            } else {
+                displayError.style.display = 'none';
+            }
+        });
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Hide any previous results
+            hideResult();
+        }
+
+        // Payment Method Form Handler
+        document.getElementById('payment-method-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const submitButton = document.getElementById('submit-pm');
+            const loadingDiv = document.getElementById('loading-pm');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            loadingDiv.style.display = 'flex';
+            hideResult();
+
+            try {
+                const { error, paymentMethod } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement,
+                    billing_details: {
+                        name: document.getElementById('cardholder-name').value,
+                        email: document.getElementById('customer-email').value,
+                        phone: document.getElementById('phone').value || undefined,
+                    },
+                });
+                console.log(paymentMethod);
+                console.log(error);
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+                // Send payment method to your backend
+                const response = await fetch(`${API_BASE_URL}/stripe/payment-methods`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: 'card',
+                        customerEmail: document.getElementById('customer-email').value,
+                        billing_details: {
+                            name: document.getElementById('cardholder-name').value,
+                            email: document.getElementById('customer-email').value,
+                            phone: document.getElementById('phone').value || undefined,
+                        },
+                        metadata: {
+                            source: 'web_form',
+                            created_at: new Date().toISOString(),
+                        }
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to save payment method');
+                }
+
+                showResult('success', 'Payment Method Created Successfully!', 
+                    'Your payment method has been securely saved and can be used for future payments.', result);
+
+            } catch (error) {
+                showResult('error', 'Payment Method Creation Failed', error.message);
+            } finally {
+                submitButton.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        });
+
+        // Direct Payment Form Handler
+        document.getElementById('payment-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const submitButton = document.getElementById('submit-payment');
+            const loadingDiv = document.getElementById('loading-payment');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            loadingDiv.style.display = 'flex';
+            hideResult();
+
+            try {
+                // Step 1: Create Payment Intent
+                const amount = Math.round(parseFloat(document.getElementById('payment-amount').value) * 100);
+                const paymentIntentResponse = await fetch(`${API_BASE_URL}/stripe/payment-intent`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        currency: 'usd',
+                        customerEmail: document.getElementById('payment-email').value,
+                        description: document.getElementById('payment-description').value,
+                        customerName: document.getElementById('payment-name').value,
+                        metadata: {
+                            source: 'web_form',
+                            created_at: new Date().toISOString(),
+                        }
+                    }),
+                });
+
+                const paymentIntent = await paymentIntentResponse.json();
+
+                if (!paymentIntentResponse.ok) {
+                    throw new Error(paymentIntent.message || 'Failed to create payment intent');
+                }
+
+                // Step 2: Confirm Payment Intent
+                const { error, paymentIntent: confirmedPayment } = await stripe.confirmCardPayment(
+                    paymentIntent.clientSecret,
+                    {
+                        payment_method: {
+                            card: paymentCardElement,
+                            billing_details: {
+                                name: document.getElementById('payment-name').value,
+                                email: document.getElementById('payment-email').value,
+                            },
+                        }
+                    }
+                );
+
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+                if (confirmedPayment.status === 'succeeded') {
+                    showResult('success', 'Payment Successful!', 
+                        `Your payment of $${document.getElementById('payment-amount').value} has been processed successfully.`, 
+                        confirmedPayment);
+                } else {
+                    throw new Error(`Payment status: ${confirmedPayment.status}`);
+                }
+
+            } catch (error) {
+                showResult('error', 'Payment Failed', error.message);
+            } finally {
+                submitButton.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        });
+
+        // Utility functions
+        function showResult(type, title, message, details = null) {
+            const resultDiv = document.getElementById('result');
+            const titleDiv = document.getElementById('result-title');
+            const messageDiv = document.getElementById('result-message');
+            const detailsDiv = document.getElementById('result-details');
+
+            resultDiv.className = `result-container result-${type}`;
+            titleDiv.textContent = title;
+            messageDiv.textContent = message;
+
+            if (details) {
+                detailsDiv.textContent = JSON.stringify(details, null, 2);
+                detailsDiv.style.display = 'block';
+            } else {
+                detailsDiv.style.display = 'none';
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        function hideResult() {
+            document.getElementById('result').style.display = 'none';
+        }
+
+        // Auto-format phone number (simple implementation)
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 3) {
+                    value = `+${value}`;
+                } else if (value.length <= 6) {
+                    value = `+${value.slice(0, 1)} (${value.slice(1, 4)}) ${value.slice(4)}`;
+                } else if (value.length <= 10) {
+                    value = `+${value.slice(0, 1)} (${value.slice(1, 4)}) ${value.slice(4, 7)}-${value.slice(7)}`;
+                } else {
+                    value = `+${value.slice(0, 1)} (${value.slice(1, 4)}) ${value.slice(4, 7)}-${value.slice(7, 11)}`;
+                }
+            }
+            e.target.value = value;
+        });
+
+        // Test card numbers helper
+        console.log('🔧 Test Card Numbers:');
+        console.log('✅ Visa: 4242424242424242');
+        console.log('✅ Visa (debit): 4000056655665556');
+        console.log('✅ Mastercard: 5555555555554444');
+        console.log('✅ American Express: 378282246310005');
+        console.log('❌ Declined: 4000000000000002');
+        console.log('⚠️  Insufficient funds: 4000000000009995');
+        console.log('📅 Any future expiry date, any CVC');
+    </script>
+</body>
+</html>

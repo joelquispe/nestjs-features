@@ -30,6 +30,12 @@ export default registerAs('', () => ({
     // se obtiene en la cuenta de mercado pago al crear una app
     accessToken: process.env.PAYMENT_MARKET_ACCESS_TOKEN,
   },
+  stripe: {
+    // Get these from your Stripe Dashboard
+    publicKey: process.env.STRIPE_PUBLIC_KEY,
+    secretKey: process.env.STRIPE_SECRET_KEY,
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+  },
   database: {
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT, 10) || 3306,
@@ -37,6 +43,9 @@ export default registerAs('', () => ({
     password: process.env.DB_PASSWORD,
     rootPassword: process.env.DB_ROOT_PASSWORD,
     name: process.env.DB_NAME,
-    mongo_uri: process.env.MONGO_URI,
+    mongodb_uri: process.env.MONGO_URI,
   },
+  brevo: {
+    apiKey: process.env.BREVO_API_KEY
+  }
 }));
