@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ConfigType } from '@nestjs/config';
 
@@ -21,5 +21,10 @@ export class AppController {
     console.log(this.config.port);
     // throw new UnauthorizedException('asdsad');
     return this.appService.getHello();
+  }
+
+  @Post('send-log')
+  sendLog(@Body() body: any){
+    console.log(body);
   }
 }
